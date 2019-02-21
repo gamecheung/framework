@@ -230,11 +230,17 @@ void PluginManager::shutdown()
 QList<PluginSpec *> PluginManager::loadQueue(const QList<PluginSpec *>& pluginSpecs) 
 {
 	QList<PluginSpec *> queue;
+	QList<PluginSpec *> checkedSpecs;
+	lastCircularQueue.clear();
 	foreach(PluginSpec *spec, pluginSpecs) {
 		emitProgress(tr("解析队列：%1").arg(spec->name()));
-
-		QList<PluginSpec *> circularityCheckQueue;
-		loadQueue(spec, queue, circularityCheckQueue);
+		if(!checkedSpecs.contain(spec))
+		{
+			QList<PluginSpec *> circularityCheckQueue;
+			loadQueue(spec, queue, circularityCheckQueue);
+			checkedSpecs.append(circularityCheckQueue);
+		}
+		
 	}
 	return queue;
 }
